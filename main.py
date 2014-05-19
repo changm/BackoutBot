@@ -3,6 +3,7 @@ import git
 import subprocess
 import os
 import hglib
+import re
 
 GECKO_DIR=""
 GAIA_DIR=""
@@ -64,13 +65,24 @@ def FlashGaia(gaiaDir):
   subprocess.call(["adb", "reboot"])
   time.sleep(120)
 
+# Returns a tuple with (median, mean, stdDev)
+def ExtractStartupData(resultString):
+  # Our string looks like: Results for Settings, cold_load_time: median:1945, mean:2008, std: 97, max:2146, min:1934, all:2146,1934,1945
+  # strip out the median, mean, and std deviatoin numbers. Ugly Regex sadface
+  regexResults = re.search("median:([0-9]+).*mean:([0-9]+).*std: ([0-9]+).*", resultString)
+  return regexResults.groups()
+
 def RunStartupTest(appName, results):
   args = "--delay=10 --iterations=30 " + str(appName)
   print "Running b2g perf for app: " + str(appName)
-  output = subprocess.call(["b2gperf", "--delay=10", "--iterations=20", str(appName)])
-  length = len(output)
-  lastLine = output[length - 1].strip()
-  print lastLine
+  command = "b2gperf --delay=10 --iterations=3 " + str(appName)
+  proc = subprocess.Popen(["b2gperf", "--delay=10", "--iterations=3", str(appName)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  out, err = proc.communicate()
+
+  print err
+
+  median, mean, stdDev = ExtractStartupData(err)
+  print "\n\nMedian: " + str(median) + " Mean: " + str(mean) + " stdDev: " + str(stdDev)
 
 def RunB2GPerf(b2gPerfDir):
   print "\nRunning B2g Perf"
@@ -80,8 +92,6 @@ def RunB2GPerf(b2gPerfDir):
   for test in GAIA_APPS_TO_TEST:
     RunStartupTest(test, results)
 
-  #subprocess.call(["b2gperf", "--delay=10 --iterations=30 Contacts"])
-  #results['startup'] = 30
   return results
 
 def ReportResults(results):
