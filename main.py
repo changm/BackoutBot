@@ -12,8 +12,7 @@ B2G_PERF_DIR=""
 RESULTS_FILE="results.txt"
 
 # Need to get a sd card to test
-#GAIA_APPS_TO_TEST=["Settings", "Camera", "Phone"]
-GAIA_APPS_TO_TEST=["Settings"]
+GAIA_APPS_TO_TEST=["Settings", "Phone", "Camera"]
 
 def ReadConfig():
   file = open('config.txt', 'r')
@@ -78,9 +77,13 @@ def ExtractStartupData(resultString):
 
   return regexResults.groups()
 
-def WriteTestResults(appName, resultString, gaiaRevision, geckoRevision):
+def GetFileName(appName):
   global RESULTS_FILE
-  file = open(RESULTS_FILE, 'w')
+  return appName + "." + RESULTS_FILE
+
+def WriteTestResults(appName, resultString, gaiaRevision, geckoRevision):
+  fileName = GetFileName(appName)
+  file = open(fileName, 'w')
   lines = []
   lines.append("Results for: " + str(appName) + "\n")
   lines.append("Gaia Revision: " + str(gaiaRevision) + "\n")
@@ -104,11 +107,12 @@ def GetRevisions(lines):
 
 # Returns a tuple of (mean, median,stdDev, gaiaRev, geckoRev)
 def GetLastResults(appName):
-  global RESULTS_FILE
-  file = open(RESULTS_FILE, "r")
-  if (file is None):
-    print "Could not open results file: " + str(RESULTS_FILE) + ". Setting new baseline"
-    return (10000, 10000, 10000)
+  fileName = GetFileName(appName)
+  try:
+    file = open(fileName, "r")
+  except:
+    print "Could not open results file: " + str(fileName) + ". Setting new baseline"
+    return (10000, 10000, 10000, 1000, "10000:10000")
 
   lines = file.readlines()
   lines = "".join(lines)
@@ -169,6 +173,7 @@ def RunStartupTest(appName, results, gaiaRev, geckoRev):
   currentResults = ExtractStartupData(err)
 
   AnalyzeResults(lastResults, currentResults)
+  return (lastResults, currentResults)
 
 def RunB2GPerf(b2gPerfDir, gaiaRev, geckoRev):
   print "\nRunning B2g Perf"
@@ -176,13 +181,28 @@ def RunB2GPerf(b2gPerfDir, gaiaRev, geckoRev):
   results = {}
 
   for test in GAIA_APPS_TO_TEST:
-    RunStartupTest(test, results, gaiaRev, geckoRev)
+    results[test] = RunStartupTest(test, results, gaiaRev, geckoRev)
 
   return results
 
-def ReportResults(results):
-  print "Printing Results "
-  print(results)
+def ReportResults(results, gaiaRev, geckoRev):
+  print "\n==== Printing Results ====\n"
+  print "Gaia: " + str(gaiaRev)
+  print "Gecko: " + str(geckoRev) + "\n"
+
+  for test in results:
+    print "Results for test: " + test
+    lastResults, currentResults = results[test]
+
+    prevMean = lastResults[1]
+    prevStdDev = lastResults[2]
+
+    currentMean = currentResults[1]
+    currentStdDev = currentResults[2]
+
+    print "Current mean: " + str(currentMean) + " std dev: " + currentStdDev
+    print "Prev Mean: " + str(prevMean) + " std dev: " + prevStdDev
+    print ""
 
 def Main():
   global GECKO_DIR
@@ -196,6 +216,6 @@ def Main():
 
   #FlashGaia(GAIA_DIR)
   startupTimes = RunB2GPerf(B2G_PERF_DIR, gaiaRev, geckoRev)
-  #ReportResults(startupTimes)
+  ReportResults(startupTimes, gaiaRev, geckoRev)
 
 Main()
