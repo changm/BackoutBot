@@ -83,13 +83,26 @@ def WriteTestResults(appName, resultString, gaiaRevision, geckoRevision):
   file = open(RESULTS_FILE, 'w')
   lines = []
   lines.append("Results for: " + str(appName) + "\n")
-  lines.append("Gaia Revision: " + str(gaiaRevision) + "\n\n")
-  lines.append("Gecko Revision: " + str(geckoRevision) + "\n\n")
+  lines.append("Gaia Revision: " + str(gaiaRevision) + "\n")
+  lines.append("Gecko Revision: " + str(geckoRevision) + "\n")
 
   lines.append(resultString)
   file.writelines(lines)
   file.close()
 
+# Return a tuple of (gaia, gecko) revisions
+def GetRevisions(lines):
+  gaiaRev = re.search("Gaia.*: (\w+)", lines)
+  if gaiaRev:
+    gaiaRev = gaiaRev.groups()[0].strip()
+
+  geckoRev = re.search("Gecko.*: (.*)", lines)
+  if geckoRev:
+    geckoRev = geckoRev.groups()[0].strip()
+
+  return (gaiaRev, geckoRev)
+
+# Returns a tuple of (mean, median,stdDev, gaiaRev, geckoRev)
 def GetLastResults(appName):
   global RESULTS_FILE
   file = open(RESULTS_FILE, "r")
@@ -101,7 +114,8 @@ def GetLastResults(appName):
   lines = "".join(lines)
   file.close()
 
-  return ExtractStartupData(lines)
+  revisions = GetRevisions(lines)
+  return ExtractStartupData(lines) + revisions
 
 def DealWithRegression(previousResults, currentResults):
   previousMean = previousResults[1]
@@ -119,13 +133,21 @@ def PassTest(previousResults, currentResults):
   print "Current mean: " + str(currentMean) + " std dev: " + str(currentStdDev)
   print "Previous mean: " + str(prevMean) + " std dev: " + str(prevStd)
 
+  prevGaiaRev = previousResults[3]
+  prevGeckoRev = previousResults[4]
+  print "Prev Gaia: " + str(prevGaiaRev) + "\nPrev Gecko: " + prevGeckoRev
+
 # Each should be a tuple of (median, mean, stdDev)
 def AnalyzeResults(previousResults, currentResults):
-  previousMean = previousResults[1]
-  previousStdDev = previousResults[2]
+  previousMean = int(previousResults[1])
+  previousStdDev = int(previousResults[2])
+
+  print "Previous std dev: " + str(previousStdDev)
 
   threshold = previousMean + previousStdDev
-  currentMean = currentResults[1]
+  print "Threshold is: " + str(threshold)
+
+  currentMean = int(currentResults[1])
   if (currentMean >= threshold):
     DealWithRegression(previousResults, currentResults)
   else:
@@ -135,7 +157,9 @@ def RunStartupTest(appName, results, gaiaRev, geckoRev):
   args = "--delay=10 --iterations=30 " + str(appName)
   print "Running b2g perf for app: " + str(appName)
   command = "b2gperf --delay=10 --iterations=3 " + str(appName)
-  proc = subprocess.Popen(["b2gperf", "--delay=10", "--iterations=3", str(appName)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+  # Need the --reset, see bug 1011033
+  proc = subprocess.Popen(["b2gperf", "--delay=10", "--iterations=20", "--reset", str(appName)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
   out, err = proc.communicate()
 
   print err
