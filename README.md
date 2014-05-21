@@ -1,7 +1,7 @@
 BackoutBot
 ==========
 
-Finds and backs out performance regressions.
+Finds and backs out performance regressions for GAIA only.
 
 ## PreRequisites
 Python        // Main Script
@@ -30,3 +30,12 @@ In addition, a results.log.txt will contain the Gecko / Gaia revision
 and the median, mean, and std deviation of the cold launch time.
 
 The log is appended to after each run, right now we have to manually clean it.
+
+## Config
+Modify config.txt to the location of your gecko / gaia directory
+
+## Running
+Easy thing to do is just do ./run.sh. This will move your gaia commit one commit forward.
+
+If you need to run one commit again, you can run python main.py
+
