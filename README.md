@@ -21,3 +21,12 @@ Run: pip install b2gperf
 
 pip install python-hglib
 run: pip install python-hglib
+
+Expected Output:
+For each app, you will get APPNAME.results.txt
+It will contain the b2gperf output
+
+In addition, a results.log.txt will contain the Gecko / Gaia revision
+and the median, mean, and std deviation of the cold launch time.
+
+The log is appended to after each run, right now we have to manually clean it.

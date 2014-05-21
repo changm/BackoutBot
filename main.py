@@ -11,6 +11,7 @@ GECKO_DIR=""
 GAIA_DIR=""
 B2G_PERF_DIR=""
 RESULTS_FILE="results.txt"
+LOG_FILE="results.log.txt"
 
 # Do not touch these unless you're writing the code
 MEDIAN_INDEX=0
@@ -21,8 +22,6 @@ GECKO_REV_INDEX=4
 
 # Need to get a sd card to test
 GAIA_APPS_TO_TEST=["Settings", "Phone", "Camera"]
-#GAIA_APPS_TO_TEST=["Settings", "Phone"]
-
 
 def ReadConfig():
   file = open('config.txt', 'r')
@@ -64,6 +63,7 @@ def GetGeckoRevision(geckoDir):
 
 def FlashGaia(gaiaDir):
   print "\nFlash Gaia from directory: " + str(gaiaDir)
+  currentDir = os.getcwd()
   os.chdir(gaiaDir)
   env = os.environ
 
@@ -76,6 +76,7 @@ def FlashGaia(gaiaDir):
   print "Flashed Gaia, rebooting device.... Sleeping for 2 minutes"
   subprocess.call(["adb", "reboot"])
   time.sleep(120)
+  os.chdir(currentDir)
 
 # Returns a tuple with (median, mean, stdDev)
 def ExtractStartupData(resultString):
@@ -104,6 +105,7 @@ def WriteTestResults(appName, resultString, gaiaRevision, geckoRevision):
 
   lines.append(resultString)
   file.writelines(lines)
+  file.flush()
   file.close()
 
 # Return a tuple of (gaia, gecko) revisions
@@ -181,9 +183,7 @@ def AnalyzeResults(previousResults, currentResults):
     PassTest(previousResults, currentResults)
 
 def RunStartupTest(appName, results, gaiaRev, geckoRev):
-  args = "--delay=10 --iterations=30 " + str(appName)
   print "\nRunning b2g perf for app: " + str(appName)
-  command = "b2gperf --delay=10 --iterations=3 " + str(appName)
 
   # Need the --reset, see bug 1011033
   proc = subprocess.Popen(["b2gperf", "--delay=10", "--iterations=20", "--reset", str(appName)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -233,6 +233,37 @@ def ReportResults(results, gaiaRev, geckoRev):
     print "Prev Mean: " + str(prevMean) + " std dev: " + str(prevStdDev)
     print ""
 
+def WriteResults(startupTimes, gaiaRev, geckoRev):
+  global MEDIAN_INDEX
+  global MEAN_INDEX
+  global STDDEV_INDEX
+  global LOG_FILE
+
+  try:
+    file = open(LOG_FILE, 'a')
+  except:
+    print "Could not open log file"
+
+  revisions = "Gaia: " + str(gaiaRev) + " Gecko: " + (geckoRev) + "\n"
+  file.write(revisions)
+
+  for test in startupTimes:
+    lastResults, currentResults = startupTimes[test]
+
+    currentMedian = currentResults[MEDIAN_INDEX]
+    currentMean = currentResults[MEAN_INDEX]
+    currentStdDev = currentResults[STDDEV_INDEX]
+
+    line = "Test: " + str(test) + "\t"
+    line += "Median: " + str(currentMedian) + "\t"
+    line += "Mean: " + str(currentMean) + "\t"
+    line += "Std Dev: " + str(currentStdDev) + "\n"
+    file.write(line)
+
+  file.flush()
+  file.close()
+  print "Wrote results to log: " + LOG_FILE
+
 def Main():
   global GECKO_DIR
   global GAIA_DIR
@@ -244,7 +275,9 @@ def Main():
   geckoRev = GetGeckoRevision(GECKO_DIR)
 
   FlashGaia(GAIA_DIR)
+
   startupTimes = RunB2GPerf(B2G_PERF_DIR, gaiaRev, geckoRev)
   ReportResults(startupTimes, gaiaRev, geckoRev)
+  WriteResults(startupTimes, gaiaRev, geckoRev)
 
 Main()
