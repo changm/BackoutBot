@@ -9,6 +9,8 @@ GitPython     // Used to access Gaia revisions
 b2gperf       // Used to test start up time
 python-hglib  // Used to access Gecko Revisions
 
+For apps that have data in them like Music, Gallery, or Contacts, you need an SD card
+
 ## Installing Requirements:
 
 Hopefully the easy way - run setup.sh
@@ -38,4 +40,3 @@ Modify config.txt to the location of your gecko / gaia directory
 Easy thing to do is just do ./run.sh. This will move your gaia commit one commit forward.
 
 If you need to run one commit again, you can run python main.py
-
