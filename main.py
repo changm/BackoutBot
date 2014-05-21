@@ -21,7 +21,8 @@ GAIA_REV_INDEX=3
 GECKO_REV_INDEX=4
 
 # Need to get a sd card to test
-GAIA_APPS_TO_TEST=["Settings", "Phone", "Camera"]
+# These apps are case sensitive names
+GAIA_APPS_TO_TEST=["Settings", "Phone", "Camera", "Email"]
 
 def ReadConfig():
   file = open('config.txt', 'r')
