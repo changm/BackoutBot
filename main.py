@@ -20,8 +20,8 @@ GAIA_REV_INDEX=3
 GECKO_REV_INDEX=4
 
 # Need to get a sd card to test
-#GAIA_APPS_TO_TEST=["Settings", "Phone", "Camera"]
-GAIA_APPS_TO_TEST=["Settings", "Phone"]
+GAIA_APPS_TO_TEST=["Settings", "Phone", "Camera"]
+#GAIA_APPS_TO_TEST=["Settings", "Phone"]
 
 
 def ReadConfig():
