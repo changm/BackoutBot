@@ -3,13 +3,13 @@ BackoutBot
 
 Finds and backs out performance regressions.
 
-PreRequisites
+## PreRequisites
 Python        // Main Script
 GitPython     // Used to access Gaia revisions
 b2gperf       // Used to test start up time
 python-hglib  // Used to access Gecko Revisions
 
-Installing Requirements:
+## Installing Requirements:
 
 Hopefully the easy way - run setup.sh
 
@@ -22,7 +22,7 @@ Run: pip install b2gperf
 pip install python-hglib
 run: pip install python-hglib
 
-Expected Output:
+## Expected Output:
 For each app, you will get APPNAME.results.txt
 It will contain the b2gperf output
 
