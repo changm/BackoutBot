@@ -50,3 +50,5 @@ If you want to run the next commit without running forever, ./runOnce.sh
 
 ## Updating Gecko
 You have to manually update Gecko. The Gecko revision is read from the config.txt file, so you should flash from that gecko directory
+
+![Backout][images/backout.jpg]

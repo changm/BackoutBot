@@ -215,7 +215,7 @@ def RunStartupTest(appName, results, gaiaRev, geckoRev):
   print "\nRunning b2g perf for app: " + str(appName)
 
   # Need the --reset, see bug 1011033
-  proc = subprocess.Popen(["b2gperf", "--delay=10", "--iterations=20", "--reset", str(appName)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  proc = subprocess.Popen(["b2gperf", "--delay=10", "--iterations=15", "--reset", str(appName)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
   out, err = proc.communicate()
 
   print "Output from b2g perf"
