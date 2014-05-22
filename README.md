@@ -40,3 +40,5 @@ Modify config.txt to the location of your gecko / gaia directory
 Easy thing to do is just do ./run.sh. This will move your gaia commit one commit forward.
 
 If you need to run one commit again, you can run python main.py
+
+If you want to run the next commit without running forever, ./runOnce.sh

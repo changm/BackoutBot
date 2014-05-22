@@ -9,20 +9,35 @@ import time
 
 GECKO_DIR=""
 GAIA_DIR=""
-B2G_PERF_DIR=""
 RESULTS_FILE="results.txt"
 LOG_FILE="results.log.txt"
-
-# Do not touch these unless you're writing the code
-MEDIAN_INDEX=0
-MEAN_INDEX=1
-STDDEV_INDEX=2
-GAIA_REV_INDEX=3
-GECKO_REV_INDEX=4
+REGRESSIONS_FILE="regressions.txt"
 
 # Need to get a sd card to test
 # These apps are case sensitive names
 GAIA_APPS_TO_TEST=["Settings", "Phone", "Camera", "Email"]
+
+# Tuples from results are in the order of
+# (median, mean, std dev, gaia rev, gecko rev)
+def GetMedian(results):
+  medianIndex = 0
+  return results[medianIndex]
+
+def GetMean(results):
+  meanIndex = 1
+  return results[meanIndex]
+
+def GetStdDev(results):
+  stdDevIndex = 2
+  return results[stdDevIndex]
+
+def GetGaiaRev(results):
+  gaiaRevIndex = 3
+  return str(results[gaiaRevIndex])
+
+def GetGeckoRev(results):
+  geckoRevIndex = 4
+  return str(results[geckoRevIndex])
 
 def ReadConfig():
   file = open('config.txt', 'r')
@@ -137,49 +152,62 @@ def GetLastResults(appName):
   revisions = GetRevisions(lines)
   return ExtractStartupData(lines) + revisions
 
-def DealWithRegression(previousResults, currentResults):
-  previousMean = previousResults[1]
-  currentMean = currentResults[1]
+def DealWithRegression(appName, previousResults, currentResults):
+  global REGRESSIONS_FILE
+
+  previousMean = GetMean(previousResults)
+  prevStdDev = GetStdDev(previousResults)
+
+  currentMean = GetMean(currentResults)
+  currentStdDev = GetStdDev(currentResults)
   print "AND WE HAVE A REGRESSION. Previous Mean: " + str(previousMean) + " current mean: " + currentMean
 
+  try:
+    file = open(REGRESSIONS_FILE, "a")
+  except:
+    print "Could not open regressions file"
+    return
+
+  gaiaRev = GetGaiaRev(currentResults)
+  geckoRev = GetGeckoRev(currentResults)
+
+  line = "Regression in app: " + appName + "\n"
+  line = "Gaia Rev: " + gaiaRev + " Gecko Rev: " + geckoRev + "\n"
+  line += "Previous mean: " + str(previousMean) + " prev std dev: " + str(prevStdDev) + "\n"
+  line += "Current mean: " + str(currentMean) + " current std dev: " + str(currentStdDev) + "\n"
+
+  file.write(line)
+  file.flush()
+  file.close()
+
 def PassTest(previousResults, currentResults):
-  global MEAN_INDEX
-  global STDDEV_INDEX
-  global GAIA_REV_INDEX
-  global GECKO_REV_INDEX
+  prevMean = GetMean(previousResults)
+  prevStd = GetStdDev(previousResults)
 
-  prevMean = previousResults[MEAN_INDEX]
-  prevStd = previousResults[STDDEV_INDEX]
-
-  currentMean = currentResults[MEAN_INDEX]
-  currentStdDev = currentResults[STDDEV_INDEX]
+  currentMean = GetMean(currentResults)
+  currentStdDev = GetStdDev(currentResults)
 
   print "\nPassed Tests"
   print "Current mean: " + str(currentMean) + " std dev: " + str(currentStdDev)
   print "Previous mean: " + str(prevMean) + " std dev: " + str(prevStd)
 
-  prevGaiaRev = previousResults[GAIA_REV_INDEX]
-  prevGeckoRev = previousResults[GECKO_REV_INDEX]
+  prevGaiaRev = GetGaiaRev(previousResults)
+  prevGeckoRev = GetGeckoRev(previousResults)
   print "Prev Gaia: " + str(prevGaiaRev) + "\nPrev Gecko: " + prevGeckoRev
 
 # Each should be a tuple of (median, mean, stdDev)
-def AnalyzeResults(previousResults, currentResults):
-  global MEAN_INDEX
-  global STDDEV_INDEX
-  global GAIA_REV_INDEX
-  global GECKO_REV_INDEX
-
-  previousMean = int(previousResults[MEAN_INDEX])
-  previousStdDev = int(previousResults[STDDEV_INDEX])
+def AnalyzeResults(appName, previousResults, currentResults):
+  previousMean = int(GetMean(previousResults))
+  previousStdDev = int(GetStdDev(previousResults))
 
   print "Previous std dev: " + str(previousStdDev)
 
   threshold = previousMean + previousStdDev
   print "Threshold is: " + str(threshold)
 
-  currentMean = int(currentResults[MEAN_INDEX])
+  currentMean = int(GetMean(currentResults))
   if (currentMean >= threshold):
-    DealWithRegression(previousResults, currentResults)
+    DealWithRegression(appName, previousResults, currentResults)
   else:
     PassTest(previousResults, currentResults)
 
@@ -195,12 +223,12 @@ def RunStartupTest(appName, results, gaiaRev, geckoRev):
 
   lastResults = GetLastResults(appName)
   WriteTestResults(appName, err, gaiaRev, geckoRev)
-  currentResults = ExtractStartupData(err)
+  currentResults = ExtractStartupData(err) + (gaiaRev, geckoRev)
 
-  AnalyzeResults(lastResults, currentResults)
+  AnalyzeResults(appName, lastResults, currentResults)
   return (lastResults, currentResults)
 
-def RunB2GPerf(b2gPerfDir, gaiaRev, geckoRev):
+def RunB2GPerf(gaiaRev, geckoRev):
   print "\nRunning B2g Perf"
   subprocess.call(["adb", "forward", "tcp:2828", "tcp:2828"])
   results = {}
@@ -211,11 +239,6 @@ def RunB2GPerf(b2gPerfDir, gaiaRev, geckoRev):
   return results
 
 def ReportResults(results, gaiaRev, geckoRev):
-  global MEAN_INDEX
-  global STDDEV_INDEX
-  global GAIA_REV_INDEX
-  global GECKO_REV_INDEX
-
   print "\n==== Printing Results ====\n"
   print "Gaia: " + str(gaiaRev)
   print "Gecko: " + str(geckoRev) + "\n"
@@ -224,22 +247,17 @@ def ReportResults(results, gaiaRev, geckoRev):
     print "Results for test: " + test
     lastResults, currentResults = results[test]
 
-    prevMean = lastResults[MEAN_INDEX]
-    prevStdDev = lastResults[STDDEV_INDEX]
+    prevMean = GetMean(lastResults)
+    prevStdDev = GetStdDev(lastResults)
 
-    currentMean = currentResults[MEAN_INDEX]
-    currentStdDev = currentResults[STDDEV_INDEX]
+    currentMean = GetMean(currentResults)
+    currentStdDev = GetStdDev(currentResults)
 
     print "Current mean: " + str(currentMean) + " std dev: " + str(currentStdDev)
     print "Prev Mean: " + str(prevMean) + " std dev: " + str(prevStdDev)
     print ""
 
 def WriteResults(startupTimes, gaiaRev, geckoRev):
-  global MEDIAN_INDEX
-  global MEAN_INDEX
-  global STDDEV_INDEX
-  global LOG_FILE
-
   try:
     file = open(LOG_FILE, 'a')
   except:
@@ -251,9 +269,9 @@ def WriteResults(startupTimes, gaiaRev, geckoRev):
   for test in startupTimes:
     lastResults, currentResults = startupTimes[test]
 
-    currentMedian = currentResults[MEDIAN_INDEX]
-    currentMean = currentResults[MEAN_INDEX]
-    currentStdDev = currentResults[STDDEV_INDEX]
+    currentMedian = GetMedian(currentResults)
+    currentMean = GetMean(currentResults)
+    currentStdDev = GetStdDev(currentResults)
 
     line = "Test: " + str(test) + "\t"
     line += "Median: " + str(currentMedian) + "\t"
@@ -268,7 +286,6 @@ def WriteResults(startupTimes, gaiaRev, geckoRev):
 def Main():
   global GECKO_DIR
   global GAIA_DIR
-  global B2G_PERF_DIR
 
   config = ReadConfig()
   ParseConfigs(config)
@@ -277,7 +294,7 @@ def Main():
 
   FlashGaia(GAIA_DIR)
 
-  startupTimes = RunB2GPerf(B2G_PERF_DIR, gaiaRev, geckoRev)
+  startupTimes = RunB2GPerf(gaiaRev, geckoRev)
   ReportResults(startupTimes, gaiaRev, geckoRev)
   WriteResults(startupTimes, gaiaRev, geckoRev)
 
