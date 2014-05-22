@@ -16,13 +16,16 @@ For apps that have data in them like Music, Gallery, or Contacts, you need an SD
 Hopefully the easy way - run setup.sh
 
 GitPython - https://gitorious.org/git-python
+
 Run: easy\_install gitpython
 
 b2g perf - https://github.com/mozilla/b2gperf
+
 Run: pip install b2gperf
 
-pip install python-hglib
-run: pip install python-hglib
+python-hglib
+
+Run: pip install python-hglib
 
 ## Expected Output:
 For each app, you will get APPNAME.results.txt
