@@ -42,7 +42,7 @@ Finally, if a regression is detected, it will output in regressions.txt
 Modify config.txt to point to the location of your gecko / gaia directory
 
 ## Running
-Easy thing to do is just do ./run.sh. This will move your gaia directory one commit forward.
+Easy thing to do is just do ./run.sh. This will move your gaia directory one commit forward. It will run FOREVER. So if you execute this, run it in the background or in a screen.
 
 If you need to run one commit again, you can run python main.py
 
