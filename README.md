@@ -51,4 +51,13 @@ If you want to run the next commit without running forever, ./runOnce.sh
 ## Updating Gecko
 You have to manually update Gecko. The Gecko revision is read from the config.txt file, so you should flash from that gecko directory
 
+## FAQ
+  1. I can't install any of the requirements? It says Permission denied!
+
+  We try to install the python libraries using pip, which has to write some files to your python install directory. This is probably somewhere in /Library, which needs sudo access. Try using sudo. I know, I'm evil and bad, but oh so lazy.
+
+  2. b2gperf isn't working anymore!
+
+  Sometimes b2gperf is updated along with Gecko. Please update Gecko and run the setup.sh script again. This will update b2gperf and Gecko so that they are in sync again.
+
 ![ScreenShot](/images/backout.jpg)

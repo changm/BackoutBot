@@ -1,2 +1,2 @@
-GAIA_DIR=/home/moz/Projects/gaia
-GECKO_DIR=/home/moz/Projects/mozilla-central
+GAIA_DIR=/home/masonchang/Projects/gaia
+GECKO_DIR=/home/masonchang/Projects/mozilla-central

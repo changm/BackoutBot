@@ -2,7 +2,11 @@
 easy_install gitpython
 if [ $? -ne 0 ]
 then
-  echo "Could not install gitpython. Exiting"
+  echo "==== OH NOES!!. Please read below ==="
+  echo "Could not install gitpython. Did you get a permission denied? Run me with sudo!."
+  echo "I also need internet. Make sure I have internet plz. kthxbai"
+  echo
+  echo "Exiting"
   exit 1
 fi
 
@@ -26,3 +30,6 @@ then
   echo "Could not install python hglib. Exiting"
   exit 1
 fi
+
+echo
+echo "==== Finished Installing Reqs for Backout Bot ===="

@@ -3,6 +3,30 @@
 source config.txt
 CURRENT_DIR=`pwd`
 
+CheckReqs()
+{
+  if [ ! -d $GAIA_DIR ]
+  then
+    echo "Could not find GAIA directory in $GAIA_DIR"
+    echo "Check config.txt please"
+    exit 1
+  fi
+
+  if [ ! -d $GECKO_DIR ]
+  then
+    echo "Could not find GECKO Directory in $GECKO_DIR"
+    echo "Check config.txt please"
+    exit 1
+  fi
+
+  b2gperf &> /dev/null
+  if [ $? -ne 0 ]
+  then
+    echo "Could not find b2g perf. Run installReqs.sh"
+    exit 1
+  fi
+}
+
 MoveHead()
 {
   echo "Moving forward one commit"
@@ -31,8 +55,13 @@ MoveHead()
   fi # end at next commit
 }
 
-MoveHead
+RunScript()
+{
+  echo "Running Python Script"
+  cd $CURRENT_DIR
+  python main.py
+}
 
-echo "Running Python Script"
-cd $CURRENT_DIR
-python main.py
+CheckReqs
+MoveHead
+RunScript
