@@ -15,7 +15,7 @@ REGRESSIONS_FILE="regressions.txt"
 
 # Need to get a sd card to test
 # These apps are case sensitive names
-GAIA_APPS_TO_TEST=["Settings", "Phone", "Camera", "Email"]
+GAIA_APPS_TO_TEST=["Settings", "Phone", "Camera", "Email", "Contacts"]
 
 # Tuples from results are in the order of
 # (median, mean, std dev, gaia rev, gecko rev)
