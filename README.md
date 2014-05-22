@@ -33,6 +33,8 @@ and the median, mean, and std deviation of the cold launch time.
 
 The log is appended to after each run, right now we have to manually clean it.
 
+Finally, if a regression is detected, it will output in regressions.txt
+
 ## Config
 Modify config.txt to the location of your gecko / gaia directory
 
@@ -42,3 +44,6 @@ Easy thing to do is just do ./run.sh. This will move your gaia commit one commit
 If you need to run one commit again, you can run python main.py
 
 If you want to run the next commit without running forever, ./runOnce.sh
+
+## Updating Gecko
+You have to manually update Gecko. The Gecko revision is read from the config.txt file, so you should flash from that gecko directory
