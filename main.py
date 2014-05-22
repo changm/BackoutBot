@@ -172,7 +172,7 @@ def DealWithRegression(appName, previousResults, currentResults):
   geckoRev = GetGeckoRev(currentResults)
 
   line = "Regression in app: " + appName + "\n"
-  line = "Gaia Rev: " + gaiaRev + " Gecko Rev: " + geckoRev + "\n"
+  line += "Gaia Rev: " + gaiaRev + " Gecko Rev: " + geckoRev + "\n"
   line += "Previous mean: " + str(previousMean) + " prev std dev: " + str(prevStdDev) + "\n"
   line += "Current mean: " + str(currentMean) + " current std dev: " + str(currentStdDev) + "\n"
 
