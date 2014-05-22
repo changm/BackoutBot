@@ -4,10 +4,10 @@ BackoutBot
 Finds and backs out performance regressions for GAIA only.
 
 ## PreRequisites
-Python        // Main Script
-GitPython     // Used to access Gaia revisions
-b2gperf       // Used to test start up time
-python-hglib  // Used to access Gecko Revisions
+* Python        // Main Script
+* GitPython     // Used to access Gaia revisions
+* b2gperf       // Used to test start up time
+* python-hglib  // Used to access Gecko Revisions
 
 For apps that have data in them like Music, Gallery, or Contacts, you need an SD card
 
