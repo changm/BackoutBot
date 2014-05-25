@@ -87,7 +87,10 @@ def FlashGaia(gaiaDir):
   # can't unlock the homescreen, so we have to have FTU up. sad
   # env["NOFTU"] = "1"
 
-  subprocess.call(["make", "reset-gaia"])
+  retVal = subprocess.call(["make", "reset-gaia"])
+  if retVal != 0:
+    print "Error running make reset gaia. Probably no device attached? Exiting"
+    sys.exit()
 
   print "Flashed Gaia, rebooting device.... Sleeping for 2 minutes"
   subprocess.call(["adb", "reboot"])
