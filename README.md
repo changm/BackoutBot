@@ -44,9 +44,9 @@ Modify config.txt to point to the location of your gecko / gaia directory
 ## Running
 Easy thing to do is just do ./run.sh. This will move your gaia directory one commit forward. It will run FOREVER. So if you execute this, run it in the background or in a screen.
 
-If you need to run one commit again, you can run python main.py
+If you want to run the current commit without running forever, ./runOnce.sh. It will move the Gaia repo one commit forward after running the tests.
 
-If you want to run the next commit without running forever, ./runOnce.sh
+If you need to run one commit again, without moving one commit forward, you can run python main.py.
 
 ## Updating Gecko
 You have to manually update Gecko. The Gecko revision is gecko directory read from the config.txt file, so you should flash from that gecko directory. Try to update Gecko once every day or two.
