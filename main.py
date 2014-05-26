@@ -241,6 +241,9 @@ def RunB2GPerf(gaiaRev, geckoRev):
 
   for test in GAIA_APPS_TO_TEST:
     results[test] = RunStartupTest(test, results, gaiaRev, geckoRev)
+    # Sleep for 5 seconds between b2g perf to reduce
+    # variability of first runs on some apps
+    time.sleep(5)
 
   return results
 
