@@ -60,6 +60,11 @@ RunScript()
   echo "Running Python Script"
   cd $CURRENT_DIR
   python main.py
+  if [ $? -ne 0 ]
+  then
+    echo "Could not successfully test gaia. stopping"
+    exit 1
+  fi
 }
 
 CheckReqs
