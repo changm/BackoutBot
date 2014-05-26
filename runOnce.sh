@@ -68,5 +68,5 @@ RunScript()
 }
 
 CheckReqs
-RunScript
 MoveHead
+RunScript
