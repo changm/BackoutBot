@@ -39,7 +39,7 @@ The log is appended to after each run, right now we have to manually clean it.
 Finally, if a regression is detected, it will output in regressions.txt
 
 ## Config
-Modify config.txt to point to the location of your gecko / gaia directory
+Modify config.txt to point to the location of your gecko / gaia directory. The Gecko directory must be the mozilla-central directory from mercurial. http://hg.mozilla.org/mozilla-central
 
 ## Running
 Easy thing to do is just do ./run.sh. This will move your gaia directory one commit forward. It will run FOREVER. So if you execute this, run it in the background or in a screen.
