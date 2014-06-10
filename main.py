@@ -221,7 +221,7 @@ def RunStartupTest(appName, results, gaiaRev, geckoRev):
   # b2gperf does 30 iterations, but that takes too long to execute
   # 20 might the right number. Can barely keep up with gaia check in rate.
   # 15 has too many spikes that it creates false regressions.
-  proc = subprocess.Popen(["b2gperf", "--delay=5", "--iterations=20", "--reset", str(appName)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  proc = subprocess.Popen(["b2gperf", "--delay=8", "--iterations=20", "--reset", str(appName)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
   out, err = proc.communicate()
 
   print "Output from b2g perf"
